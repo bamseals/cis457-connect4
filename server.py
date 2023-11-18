@@ -1,4 +1,5 @@
 import socket
+import board
 
 default_ip = "127.0.0.1"
 default_port = 4444
@@ -11,6 +12,7 @@ class Server:
         self.buffer = 1024
         self.player1 = None # Connection to player 1
         self.player2 = None # Connection to player 2
+        self.board = None # Game board
         
     def run(self):
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -32,6 +34,7 @@ class Server:
             self.disconnect()
 
     def gameLoop(self):
+        self.board = board.Board()
         # Game Logic goes here
         self.disconnect()
 
