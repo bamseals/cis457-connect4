@@ -1,4 +1,5 @@
 import socket
+import json
 
 default_ip = "127.0.0.1"
 default_port = 4444
@@ -32,9 +33,24 @@ class Client:
             elif "Your turn, pick a column" in line:
                 msg = input("Your turn, pick a column: ")
                 self.sendMsg(msg)
+            elif line.startswith('{') and line.endswith('}'):
+                self.printBoard(line)
             else:
                 print(line)
         self.gameLoop()
+
+    def printBoard(self, str):
+        array = json.loads(str)
+        for row in array:
+            rowString = ''
+            for col in array[row]:
+                if array[row][col] == 0:
+                    rowString += '[ ]'
+                elif array[row][col] == 1:
+                    rowString += '[X]'
+                elif array[row][col] == 2:
+                    rowString += '[O]'
+            print(rowString)
 
     def receiveMsg(self):
         message = self.socket.recv(self.buffer).decode('utf-8')
