@@ -24,12 +24,25 @@ class Client:
         self.gameLoop()
 
     def gameLoop(self):
+        message = self.receiveMsg()
+        lines = message.split("\0")
+        for line in lines:
+            if (line == 'end'):
+                self.disconnect()
+            elif "Your turn, pick a column" in line:
+                msg = input("Your turn, pick a column: ")
+                self.sendMsg(msg)
+            else:
+                print(line)
+        self.gameLoop()
+
+    def receiveMsg(self):
         message = self.socket.recv(self.buffer).decode('utf-8')
-        print(message)
+        return message
 
-        # Game Logic will go here
-
-        self.disconnect()
+    def sendMsg(self, msg):
+        encode = (msg+'\0').encode('utf-8')
+        self.socket.send(encode)
 
     def disconnect(self):
         self.socket.close()

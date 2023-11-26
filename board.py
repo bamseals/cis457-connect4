@@ -1,3 +1,5 @@
+import json
+
 class Board:
     def __init__(self):
         self.turn = 0  # how many turns have been taken in the game
@@ -6,6 +8,7 @@ class Board:
         self.cols = 7
         self.board = self.buildBoard()
         self.last_move = [0, 0]
+        self.game_over = False
 
     def buildBoard(self):
         """
@@ -168,6 +171,9 @@ class Board:
         for r in range(self.rows):
             print(barr[r])
         return
+    
+    def serialize_board(self):
+        return json.dumps(self.board)
 
     def next_turn(self):
         if self.player_turn == 1:
@@ -176,32 +182,32 @@ class Board:
             self.player_turn = 1
 
 
-# Some small testing
-b = Board()
-b.buildBoard()
-# x
-b.place_piece(3)
-b.next_turn()
-# o
-b.place_piece(4)
-b.next_turn()
-# x
-b.place_piece(4)
-b.next_turn()
-# o
-b.place_piece(5)
-b.place_piece(5)
-b.next_turn()
-# x
-b.place_piece(5)
-b.next_turn()
-# o
-b.place_piece(6)
-b.place_piece(6)
-b.place_piece(6)
-b.next_turn()
-# x
-b.place_piece(6)
-print(b.board)
-# print(b.check_win(b.last_move))
-print(b.print_board())
+# # Some small testing
+# b = Board()
+# b.buildBoard()
+# # x
+# b.place_piece(3)
+# b.next_turn()
+# # o
+# b.place_piece(4)
+# b.next_turn()
+# # x
+# b.place_piece(4)
+# b.next_turn()
+# # o
+# b.place_piece(5)
+# b.place_piece(5)
+# b.next_turn()
+# # x
+# b.place_piece(5)
+# b.next_turn()
+# # o
+# b.place_piece(6)
+# b.place_piece(6)
+# b.place_piece(6)
+# b.next_turn()
+# # x
+# b.place_piece(6)
+# print(b.board)
+# # print(b.check_win(b.last_move))
+# print(b.print_board())
