@@ -118,6 +118,8 @@ class Board:
             if count == 4:
                 win = True
             c += 1
+
+        self.game_over = win
         return win
 
     def check_tie(self):
