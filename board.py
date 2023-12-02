@@ -1,5 +1,6 @@
 import json
 
+
 class Board:
     def __init__(self):
         self.turn = 0  # how many turns have been taken in the game
@@ -23,22 +24,25 @@ class Board:
                 board[r][c] = 0
         return board
 
-    ## TODO Win conditions are NOT finished. WIP
     def check_win(self, move):
         """
+        Checks locations nearby the move location for winning conditions (4 in a row)
 
         :param move: A coordinate array, [x, y] of the location of the piece that was dropped
         :return: Whether the move caused the player to win
         """
 
-        y = move[0]
-        x = move[1]
+        # Note: x is rows, y is columns
+        x = move[0]
+        y = move[1]
         win = False
 
-        # Horizontal Check
+        # Vertical Check
         curr_4 = []
-        for i in range(max(0, x - 3), min(self.cols - 1, x + 4)):
+        for i in range(max(0, x - 3), min(self.rows, x + 4)):
             count = 0
+            if win:
+                break
             curr_4.append(self.board[i][y])
             if len(curr_4) > 4:
                 curr_4.pop(0)
@@ -48,12 +52,12 @@ class Board:
             if count == 4:
                 win = True
 
-        # Vertical Check
-        x = move[1]
+        # Horizontal Check
         curr_4 = []
-        for i in range(max(0, y - 3), min(self.rows, y + 4)):
+        for i in range(max(0, y - 3), min(self.cols, y + 4)):
             count = 0
-
+            if win:
+                break
             curr_4.append(self.board[x][i])
             if len(curr_4) > 4:
                 curr_4.pop(0)
@@ -63,16 +67,23 @@ class Board:
             if count == 4:
                 win = True
 
-        # Bottom left to top right diagonal
-        y = move[0]
-        x = move[1]
-        y += 3
-        if y > 5:
-            y = 5
+        # Top right to bottom left diagonal
+        r = move[0]
+        c = move[1]
+        c += 3
+        r -= 3
+        if r < 0:
+            c -= 0 - r
+            r = 0
+        if c > self.cols - 1:
+            r += c - (self.cols - 1)
+            c = self.cols - 1
         curr_4 = []
-        for i in range(max(0, x - 3), min(self.cols - 1, x + 4, y)):
+        for i in range(r, r + 7):
             count = 0
-            curr_4.append(self.board[i][y])
+            if i > self.rows - 1 or c < 0 or win:
+                break
+            curr_4.append(self.board[i][c])
             if len(curr_4) > 4:
                 curr_4.pop(0)
             for j in curr_4:
@@ -80,18 +91,25 @@ class Board:
                     count += 1
             if count == 4:
                 win = True
-            y -= 1
+            c -= 1
 
         # Top Left to bottom right diagonal
         r = move[0]
         c = move[1]
         c -= 3
+        r -= 3
+        if r < 0:
+            c += 0 - r
+            r = 0
         if c < 0:
+            r += 0 - c
             c = 0
         curr_4 = []
-        for i in range(max(0, r - 3), min(self.rows, r + 4)):
+        for i in range(r, r + 7):
             count = 0
-            curr_4.append(self.board[i][y])
+            if i > self.rows - 1 or c > self.cols - 1 or win:
+                break
+            curr_4.append(self.board[i][c])
             if len(curr_4) > 4:
                 curr_4.pop(0)
             for j in curr_4:
@@ -117,6 +135,9 @@ class Board:
             for col in self.board[row]:
                 if col == 0:
                     tie = False
+                    break
+            if not tie:
+                break
         return tie
 
     def place_piece(self, column):
@@ -126,21 +147,29 @@ class Board:
         :param column: Which column to drop the piece into
         :return: null
         """
+
+        # Generate a column array to iterate through
         col = []
         for r in range(self.rows):
             col.append(self.board[r][column])
-        i = 0
 
+        i = 0
         # Locate the highest row that has been placed in
         while col[i] == 0:
             i += 1
             if i == self.rows:
                 break
-
-        print("Placing! ", self.player_turn)
-        self.board[i - 1][column] = self.player_turn
-        self.last_move = [i - 1, column]
-        return
+        if i > 0:
+            self.board[i - 1][column] = self.player_turn
+            self.last_move = [i - 1, column]
+            win = self.check_win(self.last_move)
+            tie = False
+            if not win:
+                tie = self.check_tie()
+            self.next_turn()
+            return win, tie
+        else:
+            return "Illegal place"  # TODO: adjust this for a redo
 
     def print_board(self):
         """
@@ -155,7 +184,7 @@ class Board:
             for c in range(self.cols):
                 curr = self.board[r][c]
                 if curr == 0:
-                    pboard[r][c] = '[]'
+                    pboard[r][c] = '_'
                 elif curr == 1:
                     pboard[r][c] = 'X'
                 elif curr == 2:
@@ -171,7 +200,7 @@ class Board:
         for r in range(self.rows):
             print(barr[r])
         return
-    
+
     def serialize_board(self):
         return json.dumps(self.board)
 
@@ -180,34 +209,3 @@ class Board:
             self.player_turn = 2
         else:
             self.player_turn = 1
-
-
-# # Some small testing
-# b = Board()
-# b.buildBoard()
-# # x
-# b.place_piece(3)
-# b.next_turn()
-# # o
-# b.place_piece(4)
-# b.next_turn()
-# # x
-# b.place_piece(4)
-# b.next_turn()
-# # o
-# b.place_piece(5)
-# b.place_piece(5)
-# b.next_turn()
-# # x
-# b.place_piece(5)
-# b.next_turn()
-# # o
-# b.place_piece(6)
-# b.place_piece(6)
-# b.place_piece(6)
-# b.next_turn()
-# # x
-# b.place_piece(6)
-# print(b.board)
-# # print(b.check_win(b.last_move))
-# print(b.print_board())
