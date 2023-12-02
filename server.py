@@ -34,13 +34,15 @@ class Server:
             self.disconnect()
 
     def gameLoop(self):
+        win = False
+        tie = False
         self.board = board.Board()
         initial_board = self.board.serialize_board()
         self.sendMsg(self.player1, "Game Starting.....")
         self.sendMsg(self.player2, "Game Starting.....")
         self.sendMsg(self.player1, initial_board)
         self.sendMsg(self.player2, initial_board)
-        while self.board.game_over == False:
+        while not win and not tie:
             if self.board.player_turn == 1:
                 self.sendMsg(self.player1, "Your turn, pick a column")
                 self.sendMsg(self.player2, "Waiting on Player 1 turn...")
@@ -50,21 +52,37 @@ class Server:
                 self.sendMsg(self.player1, "Waiting on Player 2 turn...")
                 input = self.receiveMsg(self.player2)
             print(input)
-            # self.board.place_piece(input) # <-- Make sure input is cast to an integer
-            # This will increment turn as well, and returns bools: (win, tie)
-            #   which tell you whether the game is a win or a tie after that move.
-            #   If the piece is illegal (i.e. less than 0, greater than 6, or the column is full):
-            #       Will return "Illegal place" instead of (win, tie).
-            #       If this occurs, the player's turn is not changed, nor is anything placed.
-            #           Essentially, it's like the request never happened.
-            #           Probably safe to just wait until next loop.
-            #
-            #   I also added that it updates game_over to be true if there is a win.
-            #
-            #   You could also add a message saying who won after the game is over
-            self.board.next_turn()  # <-- Use place_piece instead
-               
-        # Game Logic goes here
+            if not input.isnumeric():
+                if self.board.player_turn == 1:
+                    self.sendMsg(self.player1, "Illegal place")
+                else:
+                    self.sendMsg(self.player2, "Illegal place")
+            inputint = int(input)
+            result = self.board.place_piece(inputint)
+            if result == "Illegal place":
+                if self.board.player_turn == 1:
+                    self.sendMsg(self.player1, result)
+                else:
+                    self.sendMsg(self.player2, result)
+            else:
+                boardstate = self.board.serialize_board()
+                self.sendMsg(self.player1, boardstate)
+                self.sendMsg(self.player2, boardstate)
+                win, tie = result
+        # handle how the game ends
+        if self.board.player_turn == 1:
+            winner = "Player 1"
+        else:
+            winner = "Player 2"
+        if win:
+            self.sendMsg(self.player2, winner + " wins the game")
+            self.sendMsg(self.player1, winner + " wins the game")
+        elif tie:
+            self.sendMsg(self.player2, "The game is a tie")
+            self.sendMsg(self.player1, "The game is a tie")
+
+        self.sendMsg(self.player2, "Game Over")
+        self.sendMsg(self.player1, "Game Over")
         self.disconnect()
 
     def receiveMsg(self, socket):

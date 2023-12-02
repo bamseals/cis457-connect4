@@ -33,6 +33,12 @@ class Client:
             elif "Your turn, pick a column" in line:
                 msg = input("Your turn, pick a column: ")
                 self.sendMsg(msg)
+            elif "Illegal place" in line:
+                print("Illegal place, try again:")
+                msg = input("Your turn, pick a column: ")
+            elif "Game Over" in line:
+                print("Game Over")
+                self.disconnect()
             elif line.startswith('{') and line.endswith('}'):
                 self.printBoard(line)
             else:
@@ -57,7 +63,7 @@ class Client:
         return message
 
     def sendMsg(self, msg):
-        encode = (msg+'\0').encode('utf-8')
+        encode = (msg).encode('utf-8')
         self.socket.send(encode)
 
     def disconnect(self):
