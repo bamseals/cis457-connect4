@@ -151,6 +151,8 @@ class Board:
         :return: win, tie if the placement is legal
         :return: "Illegal place" if the placement is illegal
         """
+        if column > self.cols or column < 0:
+            return "Illegal place"
 
         # Generate a column array to iterate through
         col = []
