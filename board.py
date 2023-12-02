@@ -132,7 +132,8 @@ class Board:
 
         tie = True
         for row in self.board:
-            for col in self.board[row]:
+            for i in range(self.cols):
+                col = self.board[row][i]
                 if col == 0:
                     tie = False
                     break
@@ -145,7 +146,8 @@ class Board:
         Places a piece into the first available space in the column
 
         :param column: Which column to drop the piece into
-        :return: null
+        :return: win, tie if the placement is legal
+        :return: "Illegal place" if the placement is illegal
         """
 
         # Generate a column array to iterate through
@@ -163,9 +165,7 @@ class Board:
             self.board[i - 1][column] = self.player_turn
             self.last_move = [i - 1, column]
             win = self.check_win(self.last_move)
-            tie = False
-            if not win:
-                tie = self.check_tie()
+            tie = self.check_tie()
             self.next_turn()
             return win, tie
         else:
@@ -209,3 +209,16 @@ class Board:
             self.player_turn = 2
         else:
             self.player_turn = 1
+
+
+# Some small testing
+b = Board()
+b.buildBoard()
+# o
+b.place_piece(0)
+b.place_piece(1)
+
+print(b.place_piece(5))
+print(b.place_piece(6))
+
+print(b.print_board())
