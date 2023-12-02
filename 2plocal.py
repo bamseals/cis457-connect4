@@ -17,10 +17,19 @@ def main():
         if b.player_turn == 2:
             curr_player = "Player 2 (O)"
         input_string = curr_player + ", Please enter a column 0-6: "
-        turn = input(input_string)
-        turn = int(turn)
-        win, tie = b.place_piece(turn)
+        turn = -1
+        while turn < 0 or turn > b.cols-1:
+            turn = input(input_string)
+            if turn == 'quit' or turn == 'q':
+                return "Quitting! Thanks for Playing!"
+            turn = int(turn)
+        result = b.place_piece(turn)
+        if result == "Illegal place":
+            print("Illegal place")
+        else:
+            win, tie = result
         b.print_board()
     return curr_player + " Won!"
+
 
 print(main())
