@@ -67,9 +67,9 @@ class Server:
                 win, tie = result
         # handle how the game ends
         if self.board.player_turn == 1:
-            winner = "Player 1"
-        else:
             winner = "Player 2"
+        else:
+            winner = "Player 1"
         if win:
             self.sendMsg(self.player2, winner + " wins the game")
             self.sendMsg(self.player1, winner + " wins the game")
@@ -77,9 +77,24 @@ class Server:
             self.sendMsg(self.player2, "The game is a tie")
             self.sendMsg(self.player1, "The game is a tie")
 
-        self.sendMsg(self.player2, "Game Over")
-        self.sendMsg(self.player1, "Game Over")
-        self.disconnect()
+        # check if players want to play again
+        if self.checkPlayAgain():
+            self.gameLoop()
+        else:
+            self.sendMsg(self.player2, "Game Over")
+            self.sendMsg(self.player1, "Game Over")
+            self.disconnect()
+
+    def checkPlayAgain(self):
+        self.sendMsg(self.player2, "Play again? (y/n)\n")
+        self.sendMsg(self.player1, "Play again? (y/n)\n")
+        p1input = self.receiveMsg(self.player1)
+        p2input = self.receiveMsg(self.player2)
+        if ('y' in p1input.lower() and 'y' in p2input.lower()):
+            return True
+        else:
+            return False
+        
 
     def receiveMsg(self, socket):
         message = socket.recv(self.buffer).decode('utf-8')

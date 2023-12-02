@@ -33,6 +33,9 @@ class Client:
             elif "Your turn, pick a column" in line:
                 msg = input("Your turn, pick a column: ")
                 self.sendMsg(msg)
+            elif "Play again?" in line:
+                msg = input("Play again? (y/n)")
+                self.sendMsg(msg)
             elif "Illegal place" in line:
                 print("Illegal place, try again:")
                 msg = input("Your turn, pick a column: ")
