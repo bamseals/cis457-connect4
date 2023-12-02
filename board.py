@@ -209,16 +209,3 @@ class Board:
             self.player_turn = 2
         else:
             self.player_turn = 1
-
-
-# Some small testing
-b = Board()
-b.buildBoard()
-# o
-b.place_piece(0)
-b.place_piece(1)
-
-print(b.place_piece(5))
-print(b.place_piece(6))
-
-print(b.print_board())
