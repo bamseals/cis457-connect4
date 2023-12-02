@@ -50,7 +50,19 @@ class Server:
                 self.sendMsg(self.player1, "Waiting on Player 2 turn...")
                 input = self.receiveMsg(self.player2)
             print(input)
-            self.board.next_turn()
+            # self.board.place_piece(input) # <-- Make sure input is cast to an integer
+            # This will increment turn as well, and returns bools: (win, tie)
+            #   which tell you whether the game is a win or a tie after that move.
+            #   If the piece is illegal (i.e. less than 0, greater than 6, or the column is full):
+            #       Will return "Illegal place" instead of (win, tie).
+            #       If this occurs, the player's turn is not changed, nor is anything placed.
+            #           Essentially, it's like the request never happened.
+            #           Probably safe to just wait until next loop.
+            #
+            #   I also added that it updates game_over to be true if there is a win.
+            #
+            #   You could also add a message saying who won after the game is over
+            self.board.next_turn()  # <-- Use place_piece instead
                
         # Game Logic goes here
         self.disconnect()
