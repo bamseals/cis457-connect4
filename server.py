@@ -42,32 +42,28 @@ class Server:
         self.sendMsg(self.player2, "Game Starting.....")
         self.sendMsg(self.player1, initial_board)
         self.sendMsg(self.player2, initial_board)
+        active = self.player1
+        waiting = self.player2
         while not win and not tie:
             if self.board.player_turn == 1:
-                self.sendMsg(self.player1, "Your turn, pick a column")
-                self.sendMsg(self.player2, "Waiting on Player 1 turn...")
-                input = self.receiveMsg(self.player1)
+                active = self.player1
+                waiting = self.player2
             else:
-                self.sendMsg(self.player2, "Your turn, pick a column")
-                self.sendMsg(self.player1, "Waiting on Player 2 turn...")
-                input = self.receiveMsg(self.player2)
-            print(input)
+                active = self.player2
+                waiting = self.player1
+            self.sendMsg(active, "Your turn, pick a column")
+            self.sendMsg(waiting, f"Waiting on Player {self.board.player_turn} turn...")
+            input = self.receiveMsg(active)
             if not input.isnumeric():
-                if self.board.player_turn == 1:
-                    self.sendMsg(self.player1, "Illegal place")
-                else:
-                    self.sendMsg(self.player2, "Illegal place")
+                self.sendMsg(active, "Illegal place")
             inputint = int(input)
             result = self.board.place_piece(inputint)
             if result == "Illegal place":
-                if self.board.player_turn == 1:
-                    self.sendMsg(self.player1, result)
-                else:
-                    self.sendMsg(self.player2, result)
+                self.sendMsg(active, result)
             else:
                 boardstate = self.board.serialize_board()
-                self.sendMsg(self.player1, boardstate)
-                self.sendMsg(self.player2, boardstate)
+                self.sendMsg(waiting, boardstate)
+                self.sendMsg(active, boardstate)
                 win, tie = result
         # handle how the game ends
         if self.board.player_turn == 1:

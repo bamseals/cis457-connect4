@@ -39,6 +39,7 @@ class Client:
             elif "Game Over" in line:
                 print("Game Over")
                 self.disconnect()
+                return
             elif line.startswith('{') and line.endswith('}'):
                 self.printBoard(line)
             else:
@@ -67,8 +68,8 @@ class Client:
         self.socket.send(encode)
 
     def disconnect(self):
-        self.socket.close()
         print("Game Ended")
+        self.socket.close()
 
             
             
