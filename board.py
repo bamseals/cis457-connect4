@@ -169,11 +169,11 @@ class Board:
             self.next_turn()
             return win, tie
         else:
-            return "Illegal place"  # TODO: adjust this for a redo
+            return "Illegal place"
 
     def print_board(self):
         """
-        Prints the board after converting it to Strings
+        Prints the board after converting it to Strings (interpreting 0,1,2 to _,X,O)
         Due to the way 2D arrays are printed, it is necessary to print within the function
 
         :return: null
